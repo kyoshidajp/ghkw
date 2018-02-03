@@ -1,0 +1,20 @@
+language: go
+
+go:
+  - 1.9.2
+
+os:
+  - osx
+
+sudo: false
+
+cache:
+  directories:
+    - vendor
+
+install:
+  - go get -u github.com/golang/dep/cmd/dep
+  - dep ensure
+
+script:
+  - make test-all
