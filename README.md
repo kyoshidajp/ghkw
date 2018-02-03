@@ -40,7 +40,7 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 
 -h, --help     Show this help message and exit.
 
--v, --version  Print current version.``
+-v, --version  Print current version.
 ```
 
 *NOTE*: Set Github Access Token which has "Full control of private repositories" scope as an environment variable `GITHUB_TOKEN`. If not set, `ghkw` requires your Github username and password(and two-factor auth code if you are setting). Because of using [GitHub API v3](https://developer.github.com/v3/).
