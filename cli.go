@@ -16,6 +16,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/github/hub/github"
 	api "github.com/google/go-github/github"
+	"github.com/mattn/go-colorable"
 	"github.com/mitchellh/colorstring"
 	"github.com/mitchellh/go-homedir"
 	"github.com/olekukonko/tablewriter"
@@ -46,7 +47,7 @@ func Debugf(format string, args ...interface{}) {
 // PrintErrorf prints error message on console
 func PrintErrorf(format string, args ...interface{}) {
 	format = fmt.Sprintf("[red]%s[reset]\n", format)
-	fmt.Fprint(os.Stderr,
+	fmt.Fprint(colorable.NewColorableStderr(),
 		colorstring.Color(fmt.Sprintf(format, args...)))
 }
 
