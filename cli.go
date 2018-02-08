@@ -61,18 +61,21 @@ type Searcher struct {
 	client            *api.Client
 	repository        *api.Repository
 	keywordsWithTotal map[string]int
+	language          string
 }
 
 // Run invokes the CLI with the given arguments
 func (c *CLI) Run(args []string) int {
 	var (
-		debug   bool
-		version bool
+		debug    bool
+		language string
+		version  bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.Usage = func() {
 		fmt.Fprint(c.errStream, helpText)
 	}
+	flags.StringVar(&language, "language", "", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -101,8 +104,9 @@ func (c *CLI) Run(args []string) int {
 
 	keywords := parsedArgs
 	Debugf("keyword: %s", keywords)
+	Debugf("language: %s", language)
 
-	searcher, err := NewClient(keywords)
+	searcher, err := NewClient(keywords, language)
 	if err != nil {
 		return ExitCodeError
 	}
@@ -126,8 +130,14 @@ func (s *Searcher) keywords() []string {
 }
 
 func (s *Searcher) searchRequest(keyword string, ch chan int) {
+	query := fmt.Sprintf("%s", keyword)
+	if s.language != "" {
+		query = fmt.Sprintf("%s language:%s", query, s.language)
+	}
+	Debugf("query: %s", query)
+
 	result, response, err := s.client.Search.Code(context.Background(),
-		fmt.Sprintf("%s", keyword), nil)
+		query, nil)
 	if err != nil {
 		PrintErrorf("%s\n%s", response.Status, response.Body)
 	}
@@ -215,7 +225,7 @@ func getAccessToken() (string, error) {
 }
 
 // NewClient creates SearchClient
-func NewClient(keywords []string) (*Searcher, error) {
+func NewClient(keywords []string, language string) (*Searcher, error) {
 	token, err := getAccessToken()
 	if err != nil {
 		return nil, err
@@ -239,6 +249,7 @@ func NewClient(keywords []string) (*Searcher, error) {
 		client:            client,
 		repository:        repo,
 		keywordsWithTotal: keywordsWithTotal,
+		language:          language,
 	}, nil
 }
 
@@ -268,6 +279,8 @@ ghkw is a tool to know how many keyword is used in GitHub code.
 You must specify keyword what you want to know keyword.
 
 Options:
+
+  --language     Add language to search term.
 
   -d, --debug    Enable debug mode.
                  Print debug log.
