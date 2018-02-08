@@ -35,6 +35,8 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 ### Options
 
 ```
+--language     Add language to search term.
+
 -d, --debug    Enable debug mode.
                Print debug log.
 
