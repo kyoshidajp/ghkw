@@ -63,15 +63,17 @@ type Searcher struct {
 	keywordsWithTotal map[string]int
 	language          string
 	filename          string
+	extension         string
 }
 
 // Run invokes the CLI with the given arguments
 func (c *CLI) Run(args []string) int {
 	var (
-		debug    bool
-		language string
-		filename string
-		version  bool
+		debug     bool
+		language  string
+		filename  string
+		extension string
+		version   bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.Usage = func() {
@@ -79,6 +81,7 @@ func (c *CLI) Run(args []string) int {
 	}
 	flags.StringVar(&language, "language", "", "")
 	flags.StringVar(&filename, "filename", "", "")
+	flags.StringVar(&extension, "extension", "", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -109,8 +112,9 @@ func (c *CLI) Run(args []string) int {
 	Debugf("keyword: %s", keywords)
 	Debugf("language: %s", language)
 	Debugf("filename: %s", filename)
+	Debugf("extension: %s", extension)
 
-	searcher, err := NewClient(keywords, language, filename)
+	searcher, err := NewClient(keywords, language, filename, extension)
 	if err != nil {
 		return ExitCodeError
 	}
@@ -140,6 +144,9 @@ func (s *Searcher) searchRequest(keyword string, ch chan int) {
 	}
 	if s.filename != "" {
 		query = fmt.Sprintf("%s filename:%s", query, s.filename)
+	}
+	if s.extension != "" {
+		query = fmt.Sprintf("%s extension:%s", query, s.extension)
 	}
 	Debugf("query: %s", query)
 
@@ -232,7 +239,7 @@ func getAccessToken() (string, error) {
 }
 
 // NewClient creates SearchClient
-func NewClient(keywords []string, language string, filename string) (*Searcher, error) {
+func NewClient(keywords []string, language string, filename string, extension string) (*Searcher, error) {
 	token, err := getAccessToken()
 	if err != nil {
 		return nil, err
@@ -258,6 +265,7 @@ func NewClient(keywords []string, language string, filename string) (*Searcher, 
 		keywordsWithTotal: keywordsWithTotal,
 		language:          language,
 		filename:          filename,
+		extension:         extension,
 	}, nil
 }
 
@@ -291,6 +299,8 @@ Options:
   --language     Add language to search term.
 
   --filename     Add filename to search term.
+
+  --extension    Add extension to search term.
 
   -d, --debug    Enable debug mode.
                  Print debug log.
