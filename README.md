@@ -37,6 +37,10 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 ```
 --language     Add language to search term.
 
+--filename     Add filename to search term.
+
+--extension    Add extension to search term.
+
 -d, --debug    Enable debug mode.
                Print debug log.
 
