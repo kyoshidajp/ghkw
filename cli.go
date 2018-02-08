@@ -62,6 +62,7 @@ type Searcher struct {
 	repository        *api.Repository
 	keywordsWithTotal map[string]int
 	language          string
+	filename          string
 }
 
 // Run invokes the CLI with the given arguments
@@ -69,6 +70,7 @@ func (c *CLI) Run(args []string) int {
 	var (
 		debug    bool
 		language string
+		filename string
 		version  bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -76,6 +78,7 @@ func (c *CLI) Run(args []string) int {
 		fmt.Fprint(c.errStream, helpText)
 	}
 	flags.StringVar(&language, "language", "", "")
+	flags.StringVar(&filename, "filename", "", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -105,8 +108,9 @@ func (c *CLI) Run(args []string) int {
 	keywords := parsedArgs
 	Debugf("keyword: %s", keywords)
 	Debugf("language: %s", language)
+	Debugf("filename: %s", filename)
 
-	searcher, err := NewClient(keywords, language)
+	searcher, err := NewClient(keywords, language, filename)
 	if err != nil {
 		return ExitCodeError
 	}
@@ -133,6 +137,9 @@ func (s *Searcher) searchRequest(keyword string, ch chan int) {
 	query := fmt.Sprintf("%s", keyword)
 	if s.language != "" {
 		query = fmt.Sprintf("%s language:%s", query, s.language)
+	}
+	if s.filename != "" {
+		query = fmt.Sprintf("%s filename:%s", query, s.filename)
 	}
 	Debugf("query: %s", query)
 
@@ -225,7 +232,7 @@ func getAccessToken() (string, error) {
 }
 
 // NewClient creates SearchClient
-func NewClient(keywords []string, language string) (*Searcher, error) {
+func NewClient(keywords []string, language string, filename string) (*Searcher, error) {
 	token, err := getAccessToken()
 	if err != nil {
 		return nil, err
@@ -250,6 +257,7 @@ func NewClient(keywords []string, language string) (*Searcher, error) {
 		repository:        repo,
 		keywordsWithTotal: keywordsWithTotal,
 		language:          language,
+		filename:          filename,
 	}, nil
 }
 
@@ -281,6 +289,8 @@ You must specify keyword what you want to know keyword.
 Options:
 
   --language     Add language to search term.
+
+  --filename     Add filename to search term.
 
   -d, --debug    Enable debug mode.
                  Print debug log.
