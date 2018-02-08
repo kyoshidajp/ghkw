@@ -109,12 +109,12 @@ func (c *CLI) Run(args []string) int {
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) == 0 {
-		PrintErrorf("Invalid argument: you must set keyword.")
+		PrintErrorf("Invalid argument: You must set keyword.")
 		return ExitCodeBadArgs
 	}
 
 	keywords := parsedArgs
-	Debugf("keyword: %s", keywords)
+	Debugf("keywords: %s", keywords)
 	searchTerm := NewSearchTerm(language, filename, extension)
 
 	searcher, err := NewClient(keywords, *searchTerm)
@@ -176,7 +176,7 @@ func (s *Searcher) searchRequest(keyword string, ch chan int) {
 		PrintErrorf("%s\n%s", response.Status, response.Body)
 	}
 
-	Debugf("Keyword: %s (%d)", keyword, *result.Total)
+	Debugf("keyword: %s (%d)", keyword, *result.Total)
 	ch <- *result.Total
 }
 
