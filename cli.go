@@ -61,9 +61,14 @@ type Searcher struct {
 	client            *api.Client
 	repository        *api.Repository
 	keywordsWithTotal map[string]int
-	language          string
-	filename          string
-	extension         string
+	searchTerm        *SearchTerm
+}
+
+// SearchTerm is search term in GitHub object
+type SearchTerm struct {
+	language  string
+	filename  string
+	extension string
 }
 
 // Run invokes the CLI with the given arguments
@@ -110,11 +115,9 @@ func (c *CLI) Run(args []string) int {
 
 	keywords := parsedArgs
 	Debugf("keyword: %s", keywords)
-	Debugf("language: %s", language)
-	Debugf("filename: %s", filename)
-	Debugf("extension: %s", extension)
+	searchTerm := NewSearchTerm(language, filename, extension)
 
-	searcher, err := NewClient(keywords, language, filename, extension)
+	searcher, err := NewClient(keywords, *searchTerm)
 	if err != nil {
 		return ExitCodeError
 	}
@@ -129,6 +132,32 @@ func (c *CLI) Run(args []string) int {
 	return ExitCodeOK
 }
 
+func NewSearchTerm(language string, filename string, extension string) *SearchTerm {
+	Debugf("language: %s", language)
+	Debugf("filename: %s", filename)
+	Debugf("extension: %s", extension)
+
+	return &SearchTerm{
+		language:  language,
+		filename:  filename,
+		extension: extension,
+	}
+}
+
+func (s *SearchTerm) query(keyword string) string {
+	q := keyword
+	if s.language != "" {
+		q = fmt.Sprintf("%s language:%s", q, s.language)
+	}
+	if s.filename != "" {
+		q = fmt.Sprintf("%s filename:%s", q, s.filename)
+	}
+	if s.extension != "" {
+		q = fmt.Sprintf("%s extension:%s", q, s.extension)
+	}
+	return q
+}
+
 func (s *Searcher) keywords() []string {
 	keys := make([]string, 0, len(s.keywordsWithTotal))
 	for key := range s.keywordsWithTotal {
@@ -138,16 +167,7 @@ func (s *Searcher) keywords() []string {
 }
 
 func (s *Searcher) searchRequest(keyword string, ch chan int) {
-	query := fmt.Sprintf("%s", keyword)
-	if s.language != "" {
-		query = fmt.Sprintf("%s language:%s", query, s.language)
-	}
-	if s.filename != "" {
-		query = fmt.Sprintf("%s filename:%s", query, s.filename)
-	}
-	if s.extension != "" {
-		query = fmt.Sprintf("%s extension:%s", query, s.extension)
-	}
+	query := s.searchTerm.query(keyword)
 	Debugf("query: %s", query)
 
 	result, response, err := s.client.Search.Code(context.Background(),
@@ -239,7 +259,7 @@ func getAccessToken() (string, error) {
 }
 
 // NewClient creates SearchClient
-func NewClient(keywords []string, language string, filename string, extension string) (*Searcher, error) {
+func NewClient(keywords []string, searchTerm SearchTerm) (*Searcher, error) {
 	token, err := getAccessToken()
 	if err != nil {
 		return nil, err
@@ -263,9 +283,7 @@ func NewClient(keywords []string, language string, filename string, extension st
 		client:            client,
 		repository:        repo,
 		keywordsWithTotal: keywordsWithTotal,
-		language:          language,
-		filename:          filename,
-		extension:         extension,
+		searchTerm:        &searchTerm,
 	}, nil
 }
 
