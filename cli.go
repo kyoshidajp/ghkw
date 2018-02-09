@@ -258,6 +258,18 @@ func getAccessToken() (string, error) {
 	return token, nil
 }
 
+func uniqArray(array []string) []string {
+	m := make(map[string]bool)
+	uniq := []string{}
+	for _, elem := range array {
+		if !m[elem] {
+			m[elem] = true
+			uniq = append(uniq, elem)
+		}
+	}
+	return uniq
+}
+
 // NewClient creates SearchClient
 func NewClient(keywords []string, searchTerm SearchTerm) (*Searcher, error) {
 	token, err := getAccessToken()
@@ -273,8 +285,11 @@ func NewClient(keywords []string, searchTerm SearchTerm) (*Searcher, error) {
 	client := api.NewClient(tc)
 	repo, _ := Repository(client)
 
+	uniqKeywords := uniqArray(keywords)
+	Debugf("keywords(uniq): %s", uniqKeywords)
+
 	keywordsWithTotal := map[string]int{}
-	for i := range keywords {
+	for i := range uniqKeywords {
 		keyword := keywords[i]
 		keywordsWithTotal[keyword] = 0
 	}
