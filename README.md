@@ -32,14 +32,32 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 |    3 | excluded_condition  |     2 |
 ```
 
+A search condition is in the file contents, language is javascript and file size is over 1,000bytes.
+
+```
+$ ghkw --in=file --language=javascript --size=">1000" exclude_condition exclusion_condition
+```
+
 ### Options
 
 ```
+--in           Add in to search term.
+
 --language     Add language to search term.
+
+--fork         Add fork to search term.
+
+--size         Add size to search term.
+
+--path         Add path to search term.
 
 --filename     Add filename to search term.
 
 --extension    Add extension to search term.
+
+--user         Add user to search term.
+
+--repo         Add repo to search term.
 
 -d, --debug    Enable debug mode.
                Print debug log.

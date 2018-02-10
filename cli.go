@@ -64,13 +64,6 @@ type Searcher struct {
 	searchTerm        *SearchTerm
 }
 
-// SearchTerm is search term in GitHub object
-type SearchTerm struct {
-	language  string
-	filename  string
-	extension string
-}
-
 // PairList is list of Pair
 type PairList []Pair
 
@@ -84,18 +77,30 @@ type Pair struct {
 func (c *CLI) Run(args []string) int {
 	var (
 		debug     bool
+		in        string
 		language  string
+		fork      string
+		size      string
+		path      string
 		filename  string
 		extension string
+		user      string
+		repo      string
 		version   bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flags.Usage = func() {
 		fmt.Fprint(c.errStream, helpText)
 	}
+	flags.StringVar(&in, "in", "", "")
 	flags.StringVar(&language, "language", "", "")
+	flags.StringVar(&fork, "fork", "", "")
+	flags.StringVar(&size, "size", "", "")
+	flags.StringVar(&path, "path", "", "")
 	flags.StringVar(&filename, "filename", "", "")
 	flags.StringVar(&extension, "extension", "", "")
+	flags.StringVar(&user, "user", "", "")
+	flags.StringVar(&repo, "repo", "", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -124,7 +129,18 @@ func (c *CLI) Run(args []string) int {
 
 	keywords := parsedArgs
 	Debugf("keywords: %s", keywords)
-	searchTerm := NewSearchTerm(language, filename, extension)
+
+	searchTerm := NewSearchTerm()
+	searchTerm.in = in
+	searchTerm.language = language
+	searchTerm.fork = fork
+	searchTerm.size = size
+	searchTerm.path = path
+	searchTerm.filename = filename
+	searchTerm.extension = extension
+	searchTerm.user = user
+	searchTerm.repo = repo
+	searchTerm.debugf()
 
 	searcher, err := NewClient(keywords, *searchTerm)
 	if err != nil {
@@ -139,32 +155,6 @@ func (c *CLI) Run(args []string) int {
 	searcher.output(c.outStream)
 
 	return ExitCodeOK
-}
-
-func NewSearchTerm(language string, filename string, extension string) *SearchTerm {
-	Debugf("language: %s", language)
-	Debugf("filename: %s", filename)
-	Debugf("extension: %s", extension)
-
-	return &SearchTerm{
-		language:  language,
-		filename:  filename,
-		extension: extension,
-	}
-}
-
-func (s *SearchTerm) query(keyword string) string {
-	q := keyword
-	if s.language != "" {
-		q = fmt.Sprintf("%s language:%s", q, s.language)
-	}
-	if s.filename != "" {
-		q = fmt.Sprintf("%s filename:%s", q, s.filename)
-	}
-	if s.extension != "" {
-		q = fmt.Sprintf("%s extension:%s", q, s.extension)
-	}
-	return q
 }
 
 func (s *Searcher) keywords() []string {
@@ -339,16 +329,38 @@ You must specify keyword what you want to know keyword.
 
 Options:
 
-  --language     Add language to search term.
-
-  --filename     Add filename to search term.
-
-  --extension    Add extension to search term.
-
   -d, --debug    Enable debug mode.
                  Print debug log.
 
   -h, --help     Show this help message and exit.
 
   -v, --version  Print current version.
+
+  Search Qualifiers:
+
+    --in           Add in to search term.
+  
+    --language     Add language to search term.
+  
+    --fork         Add fork to search term.
+  
+    --size         Add size to search term.
+  
+    --path         Add path to search term.
+  
+    --filename     Add filename to search term.
+  
+    --extension    Add extension to search term.
+  
+    --user         Add user to search term.
+  
+    --repo         Add repo to search term.
+
+    See Also:
+      https://developer.github.com/v3/search/#parameters-2
+
+Examples:
+    The following is how to do ghkw search "exclude_condition" and "exclusion_condition" with search option in the file contents, language is javascript and file size is over 1,000bytes.
+
+    ghkw --in=file --language=javascript --size=">1000" exclude_condition exclusion_condition
 `
