@@ -9,6 +9,7 @@ import (
 // See: https://developer.github.com/v3/search/#parameters-2
 type SearchTerm struct {
 	language  string
+	path      string
 	filename  string
 	extension string
 	user      string
