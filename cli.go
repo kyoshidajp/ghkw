@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -36,6 +37,9 @@ const (
 	ExitCodeParseFlagsError
 	ExitCodeBadArgs
 )
+
+// Ignore char in keyword
+const IGNORE_KEYWORD_CHAR = ":"
 
 // Debugf prints debug output when EnvDebug is given
 func Debugf(format string, args ...interface{}) {
@@ -273,6 +277,10 @@ func getAccessToken() (string, error) {
 	return token, nil
 }
 
+func sanitizeKeyword(keyword string) string {
+	return strings.Replace(keyword, IGNORE_KEYWORD_CHAR, "", -1)
+}
+
 // NewClient creates SearchClient
 func NewClient(keywords []string, searchTerm SearchTerm) (*Searcher, error) {
 	token, err := getAccessToken()
@@ -290,7 +298,7 @@ func NewClient(keywords []string, searchTerm SearchTerm) (*Searcher, error) {
 
 	keywordsWithTotal := map[string]int{}
 	for i := range keywords {
-		keyword := keywords[i]
+		keyword := sanitizeKeyword(keywords[i])
 		keywordsWithTotal[keyword] = 0
 	}
 
