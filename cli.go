@@ -78,6 +78,7 @@ func (c *CLI) Run(args []string) int {
 	var (
 		debug     bool
 		language  string
+		size      string
 		path      string
 		filename  string
 		extension string
@@ -90,6 +91,7 @@ func (c *CLI) Run(args []string) int {
 		fmt.Fprint(c.errStream, helpText)
 	}
 	flags.StringVar(&language, "language", "", "")
+	flags.StringVar(&size, "size", "", "")
 	flags.StringVar(&path, "path", "", "")
 	flags.StringVar(&filename, "filename", "", "")
 	flags.StringVar(&extension, "extension", "", "")
@@ -126,6 +128,7 @@ func (c *CLI) Run(args []string) int {
 
 	searchTerm := NewSearchTerm()
 	searchTerm.language = language
+	searchTerm.size = size
 	searchTerm.path = path
 	searchTerm.filename = filename
 	searchTerm.extension = extension
@@ -321,6 +324,8 @@ You must specify keyword what you want to know keyword.
 Options:
 
   --language     Add language to search term.
+
+  --size         Add size to search term.
 
   --path         Add path to search term.
 
