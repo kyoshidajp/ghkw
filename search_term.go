@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 )
 
 // SearchTerm is search term in GitHub object
+// See: https://developer.github.com/v3/search/#parameters-2
 type SearchTerm struct {
 	language  string
 	filename  string
@@ -12,28 +14,35 @@ type SearchTerm struct {
 }
 
 // NewSearchTerm creates SearchTerm
-func NewSearchTerm(language string, filename string, extension string) *SearchTerm {
-	Debugf("language: %s", language)
-	Debugf("filename: %s", filename)
-	Debugf("extension: %s", extension)
+func NewSearchTerm() *SearchTerm {
+	return &SearchTerm{}
+}
 
-	return &SearchTerm{
-		language:  language,
-		filename:  filename,
-		extension: extension,
+func (s *SearchTerm) debugf() {
+	v := reflect.Indirect(reflect.ValueOf(s))
+	t := v.Type()
+
+	var name, value string
+	for i := 0; i < t.NumField(); i++ {
+		name = t.Field(i).Name
+		value = v.Field(i).String()
+		Debugf("%s: %s", name, value)
 	}
 }
 
 func (s *SearchTerm) query(keyword string) string {
 	q := keyword
-	if s.language != "" {
-		q = fmt.Sprintf("%s language:%s", q, s.language)
-	}
-	if s.filename != "" {
-		q = fmt.Sprintf("%s filename:%s", q, s.filename)
-	}
-	if s.extension != "" {
-		q = fmt.Sprintf("%s extension:%s", q, s.extension)
+	v := reflect.Indirect(reflect.ValueOf(s))
+	t := v.Type()
+
+	var name, value string
+	for i := 0; i < t.NumField(); i++ {
+		name = t.Field(i).Name
+		value = v.Field(i).String()
+
+		if value != "" {
+			q = fmt.Sprintf("%s %s:%s", q, name, value)
+		}
 	}
 	return q
 }

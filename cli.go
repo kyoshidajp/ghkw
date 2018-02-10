@@ -117,7 +117,12 @@ func (c *CLI) Run(args []string) int {
 
 	keywords := parsedArgs
 	Debugf("keywords: %s", keywords)
-	searchTerm := NewSearchTerm(language, filename, extension)
+
+	searchTerm := NewSearchTerm()
+	searchTerm.language = language
+	searchTerm.filename = filename
+	searchTerm.extension = extension
+	searchTerm.debugf()
 
 	searcher, err := NewClient(keywords, *searchTerm)
 	if err != nil {
