@@ -71,6 +71,15 @@ type SearchTerm struct {
 	extension string
 }
 
+// PairList is list of Pair
+type PairList []Pair
+
+// Pair is key-value object
+type Pair struct {
+	key   string
+	value int
+}
+
 // Run invokes the CLI with the given arguments
 func (c *CLI) Run(args []string) int {
 	var (
@@ -195,21 +204,27 @@ func (s *Searcher) search() int {
 	return ExitCodeOK
 }
 
-func (s *Searcher) output(outStream io.Writer) {
-	// sort by total value
-	totalsWithKeyword := map[int]string{}
-	hackkeys := []int{}
-	for key, val := range s.keywordsWithTotal {
-		totalsWithKeyword[val] = key
-		hackkeys = append(hackkeys, val)
-	}
-	sort.Sort(sort.Reverse(sort.IntSlice(hackkeys)))
+func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p PairList) Len() int           { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].value > p[j].value }
 
+func sortMapByValue(m map[string]int) PairList {
+	p := make(PairList, len(m))
+	i := 0
+	for k, v := range m {
+		p[i] = Pair{k, v}
+		i++
+	}
+	sort.Sort(p)
+	return p
+}
+
+func (s *Searcher) output(outStream io.Writer) {
 	data := [][]string{}
-	for i, val := range hackkeys {
+	for i, pl := range sortMapByValue(s.keywordsWithTotal) {
 		rank := fmt.Sprintf("%d", i+1)
-		keyword := totalsWithKeyword[val]
-		total := fmt.Sprintf("%s", humanize.Comma(int64(val)))
+		keyword := pl.key
+		total := fmt.Sprintf("%s", humanize.Comma(int64(pl.value)))
 		data = append(data,
 			[]string{rank, keyword, total})
 	}
