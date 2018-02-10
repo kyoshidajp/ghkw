@@ -329,28 +329,38 @@ You must specify keyword what you want to know keyword.
 
 Options:
 
-  --in           Add in to search term.
-
-  --language     Add language to search term.
-
-  --fork         Add fork to search term.
-
-  --size         Add size to search term.
-
-  --path         Add path to search term.
-
-  --filename     Add filename to search term.
-
-  --extension    Add extension to search term.
-
-  --user         Add user to search term.
-
-  --repo         Add repo to search term.
-
   -d, --debug    Enable debug mode.
                  Print debug log.
 
   -h, --help     Show this help message and exit.
 
   -v, --version  Print current version.
+
+  Search Qualifiers:
+
+    --in           Add in to search term.
+  
+    --language     Add language to search term.
+  
+    --fork         Add fork to search term.
+  
+    --size         Add size to search term.
+  
+    --path         Add path to search term.
+  
+    --filename     Add filename to search term.
+  
+    --extension    Add extension to search term.
+  
+    --user         Add user to search term.
+  
+    --repo         Add repo to search term.
+
+    See Also:
+      https://developer.github.com/v3/search/#parameters-2
+
+Examples:
+    The following is how to do ghkw search "exclude_condition" and "exclusion_condition" with search option in the file contents, language is javascript and file size is over 1,000bytes.
+
+    ghkw --in=file --language=javascript --size=">1000" exclude_condition exclusion_condition
 `
