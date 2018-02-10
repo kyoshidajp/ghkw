@@ -77,6 +77,7 @@ type Pair struct {
 func (c *CLI) Run(args []string) int {
 	var (
 		debug     bool
+		in        string
 		language  string
 		fork      string
 		size      string
@@ -91,6 +92,7 @@ func (c *CLI) Run(args []string) int {
 	flags.Usage = func() {
 		fmt.Fprint(c.errStream, helpText)
 	}
+	flags.StringVar(&in, "in", "", "")
 	flags.StringVar(&language, "language", "", "")
 	flags.StringVar(&fork, "fork", "", "")
 	flags.StringVar(&size, "size", "", "")
@@ -129,6 +131,7 @@ func (c *CLI) Run(args []string) int {
 	Debugf("keywords: %s", keywords)
 
 	searchTerm := NewSearchTerm()
+	searchTerm.in = in
 	searchTerm.language = language
 	searchTerm.fork = fork
 	searchTerm.size = size
@@ -325,6 +328,8 @@ ghkw is a tool to know how many keyword is used in GitHub code.
 You must specify keyword what you want to know keyword.
 
 Options:
+
+  --in           Add in to search term.
 
   --language     Add language to search term.
 

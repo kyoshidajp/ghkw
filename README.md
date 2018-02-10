@@ -35,6 +35,8 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 ### Options
 
 ```
+--in           Add in to search term.
+
 --language     Add language to search term.
 
 --fork         Add fork to search term.

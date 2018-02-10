@@ -8,6 +8,7 @@ import (
 // SearchTerm is search term in GitHub object
 // See: https://developer.github.com/v3/search/#parameters-2
 type SearchTerm struct {
+	in        string
 	language  string
 	fork      string
 	size      string
