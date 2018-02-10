@@ -37,6 +37,8 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 ```
 --language     Add language to search term.
 
+--fork         Add fork to search term.
+
 --size         Add size to search term.
 
 --path         Add path to search term.

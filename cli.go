@@ -78,6 +78,7 @@ func (c *CLI) Run(args []string) int {
 	var (
 		debug     bool
 		language  string
+		fork      string
 		size      string
 		path      string
 		filename  string
@@ -91,6 +92,7 @@ func (c *CLI) Run(args []string) int {
 		fmt.Fprint(c.errStream, helpText)
 	}
 	flags.StringVar(&language, "language", "", "")
+	flags.StringVar(&fork, "fork", "", "")
 	flags.StringVar(&size, "size", "", "")
 	flags.StringVar(&path, "path", "", "")
 	flags.StringVar(&filename, "filename", "", "")
@@ -128,6 +130,7 @@ func (c *CLI) Run(args []string) int {
 
 	searchTerm := NewSearchTerm()
 	searchTerm.language = language
+	searchTerm.fork = fork
 	searchTerm.size = size
 	searchTerm.path = path
 	searchTerm.filename = filename
@@ -324,6 +327,8 @@ You must specify keyword what you want to know keyword.
 Options:
 
   --language     Add language to search term.
+
+  --fork         Add fork to search term.
 
   --size         Add size to search term.
 
