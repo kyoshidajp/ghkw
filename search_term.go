@@ -12,6 +12,7 @@ type SearchTerm struct {
 	filename  string
 	extension string
 	user      string
+	repo      string
 }
 
 // NewSearchTerm creates SearchTerm

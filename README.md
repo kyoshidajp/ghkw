@@ -43,6 +43,8 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 
 --user         Add user to search term.
 
+--repo         Add repo to search term.
+
 -d, --debug    Enable debug mode.
                Print debug log.
 

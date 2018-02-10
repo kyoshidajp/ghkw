@@ -81,6 +81,7 @@ func (c *CLI) Run(args []string) int {
 		filename  string
 		extension string
 		user      string
+		repo      string
 		version   bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -91,6 +92,7 @@ func (c *CLI) Run(args []string) int {
 	flags.StringVar(&filename, "filename", "", "")
 	flags.StringVar(&extension, "extension", "", "")
 	flags.StringVar(&user, "user", "", "")
+	flags.StringVar(&repo, "repo", "", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -125,6 +127,7 @@ func (c *CLI) Run(args []string) int {
 	searchTerm.filename = filename
 	searchTerm.extension = extension
 	searchTerm.user = user
+	searchTerm.repo = repo
 	searchTerm.debugf()
 
 	searcher, err := NewClient(keywords, *searchTerm)
@@ -321,6 +324,8 @@ Options:
   --extension    Add extension to search term.
 
   --user         Add user to search term.
+
+  --repo         Add repo to search term.
 
   -d, --debug    Enable debug mode.
                  Print debug log.
