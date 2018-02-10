@@ -11,6 +11,7 @@ type SearchTerm struct {
 	language  string
 	filename  string
 	extension string
+	user      string
 }
 
 // NewSearchTerm creates SearchTerm

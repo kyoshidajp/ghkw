@@ -41,6 +41,8 @@ $ ghkw exclusion_condition exclude_condition excluded_condition
 
 --extension    Add extension to search term.
 
+--user         Add user to search term.
+
 -d, --debug    Enable debug mode.
                Print debug log.
 
