@@ -221,8 +221,18 @@ func sortMapByValue(m map[string]int) PairList {
 
 func (s *Searcher) output(outStream io.Writer) {
 	data := [][]string{}
+	var prevRank, prevTotal int = -1, -1
+	var _rank int
 	for i, pl := range sortMapByValue(s.keywordsWithTotal) {
-		rank := fmt.Sprintf("%d", i+1)
+		if prevTotal == pl.value {
+			_rank = prevRank
+		} else {
+			_rank = i + 1
+			prevRank = _rank
+		}
+		prevTotal = pl.value
+
+		rank := fmt.Sprintf("%d", _rank)
 		keyword := pl.key
 		total := fmt.Sprintf("%s", humanize.Comma(int64(pl.value)))
 		data = append(data,
