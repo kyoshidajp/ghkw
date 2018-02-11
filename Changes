@@ -1,5 +1,14 @@
 Changes
 =======
 
+v0.1.0
+  Features:
+  * Support all of code search qualifiers
+  * Support colors on Windows (Thanks @mattn)
+
+  Fixes:
+  * When total value of keywords are same, ranks are not same and same keyword is duplicated
+  * When keyword has :(colon), 422 error is raised
+
 v0.0.1
   First release!
