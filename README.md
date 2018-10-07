@@ -90,7 +90,7 @@ $ go get -u github.com/kyoshidajp/ghkw
 
 ### Manual
 
-1. Download binary which meets your system from [Releases](release).
+1. Download binary which meets your system from [Releases](https://github.com/kyoshidajp/ghkw/releases).
 1. Unarchive it.
 1. Put `ghkw` where you want.
 1. Add `ghkw` path to `$PATH`.
