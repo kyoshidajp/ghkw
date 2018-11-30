@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"golang.org/x/oauth2"
 
@@ -66,6 +65,13 @@ type Searcher struct {
 	repository        *api.Repository
 	keywordsWithTotal map[string]int
 	searchTerm        *SearchTerm
+}
+
+// SearchResult is searching result object
+type SearchResult struct {
+	Keyword string
+	Total   int
+	Done    chan struct{}
 }
 
 // PairList is list of Pair
@@ -169,8 +175,8 @@ func (s *Searcher) keywords() []string {
 	return keys
 }
 
-func (s *Searcher) searchRequest(keyword string, ch chan int) {
-	query := s.searchTerm.query(keyword)
+func (s *Searcher) searchRequest(res *SearchResult) {
+	query := s.searchTerm.query(res.Keyword)
 	Debugf("query: %s", query)
 
 	result, response, err := s.client.Search.Code(context.Background(),
@@ -179,21 +185,30 @@ func (s *Searcher) searchRequest(keyword string, ch chan int) {
 		PrintErrorf("%s\n%s", response.Status, response.Body)
 	}
 
-	Debugf("keyword: %s (%d)", keyword, *result.Total)
-	ch <- *result.Total
+	Debugf("keyword: %s (%d)", res.Keyword, *result.Total)
+	res.Total = *result.Total
+	res.Done <- struct{}{}
 }
 
 func (s *Searcher) search() int {
-	ch := make(chan int)
 	keywords := s.keywords()
+	ch := make(chan *SearchResult, len(keywords))
 
 	for i := range keywords {
-		keyword := keywords[i]
-		go s.searchRequest(keyword, ch)
-		s.keywordsWithTotal[keyword] = <-ch
+		res := &SearchResult{
+			Keyword: keywords[i],
+			Total:   0,
+			Done:    make(chan struct{}),
+		}
+		ch <- res
+		go s.searchRequest(res)
 	}
+	close(ch)
 
-	time.Sleep(1 * time.Second)
+	for res := range ch {
+		<-res.Done
+		s.keywordsWithTotal[res.Keyword] = res.Total
+	}
 
 	return ExitCodeOK
 }
