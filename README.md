@@ -62,6 +62,9 @@ $ ghkw --in=file --language=javascript --size=">1000" exclude_condition exclusio
 -d, --debug    Enable debug mode.
                Print debug log.
 
+-f, --format   Output format (markdown, json).
+               default: markdown
+
 -h, --help     Show this help message and exit.
 
 -v, --version  Print current version.
