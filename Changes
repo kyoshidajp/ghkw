@@ -1,6 +1,14 @@
 Changes
 =======
 
+v0.2.0
+  Features:
+  * Support JSON format output
+
+  Fixes:
+  * Fix the concurrency problem (Thanks @hatajoe)
+  * Fix link to releases page (Thanks @mavimo)
+
 v0.1.0
   Features:
   * Support all of code search qualifiers
