@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -83,6 +84,18 @@ type Pair struct {
 	value int
 }
 
+// JsonResult is result for outputting as json object
+type JsonResult struct {
+	Rank    int    `json:"rank"`
+	Keyword string `json:"keyword"`
+	Total   int    `json:"total"`
+}
+
+// JsonResults is list of JsonResult
+type JsonResults struct {
+	Results []JsonResult `json:"results"`
+}
+
 // Run invokes the CLI with the given arguments
 func (c *CLI) Run(args []string) int {
 	var (
@@ -96,6 +109,7 @@ func (c *CLI) Run(args []string) int {
 		extension string
 		user      string
 		repo      string
+		format    string
 		version   bool
 	)
 	flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
@@ -111,6 +125,8 @@ func (c *CLI) Run(args []string) int {
 	flags.StringVar(&extension, "extension", "", "")
 	flags.StringVar(&user, "user", "", "")
 	flags.StringVar(&repo, "repo", "", "")
+	flags.StringVar(&format, "format", "markdown", "")
+	flags.StringVar(&format, "f", "markdown", "")
 	flags.BoolVar(&debug, "debug", false, "")
 	flags.BoolVar(&debug, "d", false, "")
 	flags.BoolVar(&version, "version", false, "")
@@ -162,7 +178,15 @@ func (c *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	searcher.output(c.outStream)
+	switch format {
+	case "markdown":
+		searcher.outputAsMarkdown(c.outStream)
+	case "json":
+		searcher.outputAsJson(c.outStream)
+	default:
+		PrintErrorf("Invalid argument: Unknown format.")
+		return ExitCodeBadArgs
+	}
 
 	return ExitCodeOK
 }
@@ -228,7 +252,7 @@ func sortMapByValue(m map[string]int) PairList {
 	return p
 }
 
-func (s *Searcher) output(outStream io.Writer) {
+func (s *Searcher) outputAsMarkdown(outStream io.Writer) {
 	data := [][]string{}
 	var prevRank, prevTotal int = -1, -1
 	var _rank int
@@ -255,6 +279,28 @@ func (s *Searcher) output(outStream io.Writer) {
 	table.SetCenterSeparator("|")
 	table.AppendBulk(data)
 	table.Render()
+}
+
+func (s *Searcher) outputAsJson(outStream io.Writer) {
+	var prevRank, prevTotal int = -1, -1
+	var _rank int
+	var j JsonResults
+	for i, pl := range sortMapByValue(s.keywordsWithTotal) {
+		if prevTotal == pl.value {
+			_rank = prevRank
+		} else {
+			_rank = i + 1
+			prevRank = _rank
+		}
+		prevTotal = pl.value
+		j.Results = append(j.Results,
+			JsonResult{Rank: _rank, Keyword: pl.key, Total: pl.value})
+	}
+	b, err := json.Marshal(j)
+	if err != nil {
+		PrintErrorf("JSON Marshal error.\n%s", err)
+	}
+	fmt.Println(string(b))
 }
 
 func getAccessTokenFromConf() (string, error) {
@@ -354,6 +400,9 @@ Options:
 
   -d, --debug    Enable debug mode.
                  Print debug log.
+
+  -f, --format   Output format (markdown, json).
+                 default: markdown
 
   -h, --help     Show this help message and exit.
 
