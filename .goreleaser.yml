@@ -6,7 +6,7 @@ before:
 
 builds:
   - main: .
-    binary: git-bump
+    binary: ghkw
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
