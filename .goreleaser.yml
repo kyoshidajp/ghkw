@@ -1,0 +1,38 @@
+project_name: ghkw
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: .
+    binary: git-bump
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+    env:
+      - CGO_ENABLED=0
+
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: darwin
+      linux: linux
+      windows: windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+release:
+  prerelease: auto
+
+scoop:
+  commit_author:
+    name: kyoshidajp
+    email: claddvd@gmail.com
+  homepage: https://github.com/kyoshidajp/ghkw
+  skip_upload: auto
+  description: Search how many keywords in GitHub Code tool
+  license: MIT
