@@ -13,8 +13,7 @@ cache:
     - vendor
 
 install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - dep ensure
+  - go build
 
 script:
   - make test-all
