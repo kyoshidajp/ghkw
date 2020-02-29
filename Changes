@@ -1,6 +1,13 @@
 Changes
 =======
 
+v0.2.1
+  Features:
+  * Replace Travis CI with GitHub Actions
+  * Add goreleaser
+  * Introduce Go Modules
+  * Versionup Go
+
 v0.2.0
   Features:
   * Support JSON format output
